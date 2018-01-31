@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.atcrowdfunding.manager.dao.UserDao" >
+
+    
+    <select id="queryPermissionByUser" resultType="com.atguigu.atcrowdfunding.common.bean.Permission" >
+    		  select
+            *
+        from t_permission
+        where id in (
+            select
+                permissionid
+            from t_role_permission
+            where roleid in (
+                select
+                    roleid
+                from t_user_role
+                where userid = #{id}
+            )
+        )
+    </select>
+    <select id="queryUserList" resultType="com.atguigu.atcrowdfunding.common.bean.User">
+        select * from t_user
+        <where>
+            <if test="queryText != null">
+            and loginacct like concat('%', #{queryText}, '%')
+            </if>
+        </where>
+        limit #{start}, #{size}
+    </select>
+    <!-- #{queryText}放到引号中他不认为是占位符 -->
+    <select id="queryUserCount" resultType="int">
+        select count(*) from t_user
+        <where>
+            <if test="queryText != null">
+            and loginacct like concat('%', #{queryText}, '%')
+            </if>
+        </where>
+    </select>
+    
+    <select id="queryPageUsers" resultType="com.atguigu.atcrowdfunding.common.bean.User">
+        select 
+            *
+        from t_user
+        limit #{start}, #{size}
+    </select>
+    
+    <select id="queryPageCount" resultType="int">
+        select
+            count(*)
+        from t_user
+    </select>
+    <!-- 前面传了三个参数， 后面的mapper文件是四个参数。 其中一个为null, 如果该字段数据库设计的时候为非空的时候就会出错 -->
+     <insert id="insertUser">
+     	insert into t_user(
+     		loginacct, username, userpswd, email, createtime
+     	) values(
+     		#{loginacct}, #{username}, #{userpswd}, #{email}, #{createtime}
+     	)
+     </insert>
+     
+     <update id="updateUser">
+     	update t_user
+     	set 
+     		loginacct = #{loginacct},
+     		username = #{username},
+     		email = #{email}
+     	where id= #{id}
+     </update>
+     <!-- // 查询当前用户已经分配的角色ID userid 简单类型   基本类型 字符串。 和基本类型的包装类-->
+       <select id="queryAssignRoleidsByUserid" resultType="int">
+        select roleid from t_user_role where userid = #{userid}
+    </select>
+    <!-- 给用户赋予角色  往关系表中增加关系了  id 是动态生成的   map中的roleids-->
+    <insert id="insertUserRoles">
+    		insert into t_user_role (
+    			userid, roleid
+    		) values 
+    		<foreach collection="roleids" item="roleid" separator=",">
+    			( #{userid}, #{roleid})
+    		</foreach>
+    </insert>
+      <!-- <insert id="insertUserRoles">
+        insert into t_user_role (
+            userid, roleid
+        ) values 
+        <foreach collection="roleids" item="roleid" separator=",">
+        ( #{userid}, #{roleid} )
+        </foreach>
+    </insert> -->
+     <delete id="deleteUserByIds">
+        delete from t_user where id in
+        <foreach collection="users" open="(" close=")" item="user" separator=",">
+        #{user.id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteUserRoles">
+        delete from t_user_role where userid = #{userid} and roleid in
+        <foreach collection="roleids" open="(" close=")" item="roleid" separator=",">
+        #{roleid}
+        </foreach>
+    </delete>
+</mapper>

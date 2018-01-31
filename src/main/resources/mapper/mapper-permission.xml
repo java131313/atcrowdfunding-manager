@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.atcrowdfunding.manager.dao.PermissionDao">
+
+    <select id="queryAll" resultType="com.atguigu.atcrowdfunding.common.bean.Permission">
+        select * from t_permission
+    </select>
+
+    <select id="queryRootPermission" resultType="com.atguigu.atcrowdfunding.common.bean.Permission">
+        select * from t_permission
+        where pid is null
+    </select>
+    
+    <select id="queryChildPermissions" resultType="com.atguigu.atcrowdfunding.common.bean.Permission">
+        select * from t_permission
+        where pid = #{pid}
+    </select>
+	
+	<!-- 查询已经分配的许可 -->
+	<select id="queryPermissionidsByRoleid" resultType="int">
+        select permissionid from t_role_permission where roleid = #{roleid}
+    </select>
+
+    <select id="queryPermissionById" resultType="com.atguigu.atcrowdfunding.common.bean.Permission">
+        select * from t_permission where id = #{id}
+    </select>
+
+    <!--  增加菜单 -->
+    <insert id="insertPermission">
+        insert into t_permission (
+            name, url, pid, icon
+        ) values (
+            #{name}, #{url}, #{pid}, #{icon}
+        )
+    </insert>
+    
+    <update id="updatePermission">
+        update t_permission
+        set name = #{name}, url = #{url}
+        where id = #{id}
+    </update>
+    
+    <delete id="deletePermissionById">
+        delete from t_permission where id = #{id}
+    </delete>
+</mapper>
