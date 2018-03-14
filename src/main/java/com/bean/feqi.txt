@@ -1,0 +1,26 @@
+zzyy 16:42:09 (多人发送)
+1	建立maven工程
+
+2	开启lombok的GAV
+
+	<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.16.6</version>
+    <scope>provided</scope>
+</dependency>   
+
+
+3	添加eclipse对lombok的相关的支持
+	java -jar lombok.jar路径包安装指定
+
+4	@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain=true)
+public class Book 
+{
+	private  @Setter@Getter Integer id;
+	private  @Setter String  name;
+	private  double  price;
+	private  String  author;
+}
